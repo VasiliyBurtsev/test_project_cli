@@ -36,12 +36,6 @@ struct packbranch
     package pack;
 };
 // В этой функции формируем ответ сервера на запрос
-void gen_response(const Request& req, Response& res) {
-  // Команда set_content задаёт ответ сервера и тип ответа:
-  // Hello, World! - тело ответа
-  // text/plain - MIME тип ответа (в данном случае обычный текст)
-  res.set_content("Hello, World!", "text/plain");
-};
 
 auto onDataReceived(char* ptr, size_t size, size_t nmemb, void* userdata) -> size_t;
 
@@ -55,7 +49,7 @@ list_json readJSONAPI(const string url,string branch, string arch, const string 
       }
       else {
         full_url_s = full_url;
-      };
+      }
     uri url(full_url_s);
     http_client client(url);
     http_request req;
@@ -86,9 +80,9 @@ list_json readJSONAPI(const string url,string branch, string arch, const string 
     json::array packages = requestTask.get().at(L"packages").as_array(); // We get the returned response here
     list_json js;
     js.branch = branch;
-    js.pack = packages.as_list();
+    js.pack = packages;
     return js;    	
-};
+}
 void writeListJSON(list_json ljs){
     
    // Достаём значения
@@ -105,15 +99,15 @@ void writeListJSON(list_json ljs){
   	  cout << "disttag " << p.disttag<< endl;
   	  cout << "buildtime " << p.buildtime<< endl;
   	  cout << "source " << p.source<< endl;
-  };
+  }
   cout << "}"<< endl;  
-};
+}
 bool IsVersionReleaseMore(package pack1, package pack2){
 	return (pack1.name == pack2.name) && (pack1.version > pack2.version) && (pack1.release > pack2.release);
 }
 bool IsElemNotInList(list<package> str_list, package pack){
     return find (str_list.begin(), str_list.end(), pack) == str_list.end();
-};
+}
 list<packbranch> ResListPack (list_json lpack1,list_json lpack2){
     list<packbranch> resl;
     packbranch pb;
@@ -122,21 +116,41 @@ list<packbranch> ResListPack (list_json lpack1,list_json lpack2){
             pb.branch = lpack1.branch;
             pb.pack = p;
             resl.push_back(pb);
-        };
+        }
         for (package p2 : lpack2.pack){
         if (IsVersionReleaseMore(p,p2)){
             pb.branch = lpack1.branch;
             pb.pack = p;
             resl.push_back(pb);
-        };
-        };
-    };
+        }
+        }
+    }
     for (package p : lpack2.pack){
         if (IsElemNotInList(lpack1,p)){
             pb.branch = lpack1.branch;
             pb.pack = p;
             resl.push_back(pb);
-        };
-    };
+        }
+    }
     return resl;    
-};
+}
+void writeResJSON(list<packbranch> ljs){    
+   // Достаём значения 
+    cout << "Result JSON" << endl;    
+  for (packbranch js : ljs){ 
+      cout << "{ "<< endl;     
+      cout << "branch : " << js.branch << ",\n";
+	  cout << "pack :  " << endl;
+      cout << "{ \n";
+      cout << "name : " << js.pack.name << ",\n"; 
+  	  cout << "epoch : " << js.pack.epoch << ",\n";
+  	  cout << "version : " << js.pack.version << ",\n";
+  	  cout << "release : " << js.pack.release << ",\n";
+  	  cout << "arch : " << js.pack.arch << ",\n";
+  	  cout << "disttag : " << js.pack.disttag << ",\n";
+  	  cout << "buildtime : " << js.pack.buildtime << ",\n";
+  	  cout << "source : " << js.pack.source << ",\n";
+      cout << "} \n";
+      cout << "}"<< endl;
+  }
+}
