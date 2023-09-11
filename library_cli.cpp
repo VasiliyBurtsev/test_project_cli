@@ -1,7 +1,5 @@
 #include <iostream>
 #include "string.h"
-#include <locale>
-#include <vector>
 #include <list>
 #include <sstream>
 #include <cpprest/http_client.h>
