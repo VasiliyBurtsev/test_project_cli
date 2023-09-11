@@ -5,13 +5,11 @@
 #include <list>
 #include <sstream>
 #include <cpprest/http_client.h>
-//#include "library/yhirose-cpp-httplib-30b7732/httplib.h"
 #include <cpprest/json.h>
 using namespace web::http;
 using namespace web::http::client;
 using namespace web;
 using namespace std;
-
 const string method = "export/branch_binary_packages";
 const string REST_API = "https://rdb.altlinux.org";
 struct package
@@ -35,11 +33,7 @@ struct packbranch
     string branch;
     package pack;
 };
-// В этой функции формируем ответ сервера на запрос
-
-auto onDataReceived(char* ptr, size_t size, size_t nmemb, void* userdata) -> size_t;
-
-constexpr auto k_max_buffer_size = 4096;
+// В этой функции считываем данныет из REST_API в виде JSON объекта
 list_json readJSONAPI(const string url,string branch, string arch, const string method){
         // Создаём клиент и привязываем к домену. Туда пойдут наши запросы
       string full_url = url+"/api/"+method+"/"+branch;
@@ -53,42 +47,36 @@ list_json readJSONAPI(const string url,string branch, string arch, const string 
     uri url(full_url_s);
     http_client client(url);
     http_request req;
-
     req.set_method(methods::GET);
     pplx::task<json::value> requestTask = client.request(req).then([](http_response response)
     {
-    
         json::value jsonObject;
         try
         {
-
             if ( response.status_code() == status_codes::OK )
             {
+		//Установим заголовки для получения типа контента в формате JSON.
                 response.headers().set_content_type(L"application/json"); // Set headers to receive content type as JSON 
-                jsonObject = response.extract_json().get();
+                // получаем json_объекты
+		jsonObject = response.extract_json().get();
             }
         }
         catch (const http_exception& e)
         {
             cout << e.error_code().message() << "\n";
-        }
-        
-        return jsonObject; // returned a json value
-    
+        }        
+        return jsonObject; // возвращает значения json
     });
-
     json::array packages = requestTask.get().at(L"packages").as_array(); // We get the returned response here
     list_json js;
     js.branch = branch;
     js.pack = packages;
     return js;    	
 }
-void writeListJSON(list_json ljs){
-    
+void writeListJSON(list_json ljs){    
    // Достаём значения
   ljs.branch = branch;
-  cout << "branch " << ljs.branch << endl;
-   
+  cout << "branch " << ljs.branch << endl;   
   cout << "{ "<< endl;
   for (package p : ljs.pack){
 	  cout << "name " << p.name<< endl;
@@ -103,7 +91,13 @@ void writeListJSON(list_json ljs){
   cout << "}"<< endl;  
 }
 bool IsVersionReleaseMore(package pack1, package pack2){
-	return (pack1.name == pack2.name) && (pack1.version > pack2.version) && (pack1.release > pack2.release);
+	bool cond1 = pack1.source == pack2.source;
+	bool cond2 = (pack1.name.find(pack2.name) != std::string::npos) || (pack2.name.find(pack1.name) != std::string::npos);
+	bool cond3 = (pack1.epoch != null) && (pack2.epoch != null);
+	bool cond4 = (pack1.epoch !=0) && (pack1.epoch > pack2.epoch); 
+	bool cond5 = (pack1.version > pack2.version) && (pack1.release > pack2.release);
+	bool cond_general = cond1 && cond2 && cond3 && cond4 && cond5;
+	return cond_general;
 }
 bool IsElemNotInList(list<package> str_list, package pack){
     return find (str_list.begin(), str_list.end(), pack) == str_list.end();
