@@ -1,12 +1,11 @@
 #ifndef library_cli_h_
 #define library_cli_h_
-#define REST_API "https://rdb.altlinux.org"
-#define method "export/branch_binary_packages"
+#define REST_API 
+#define method 
+#define NULL nullptr
 #include <iostream>
 #include "string.h"
-#include <locale>
-#include <vector>
-#include <sstream>
+#include <list>
 #include <cpprest/http_client.h>
 #include <cpprest/filestream.h>
 #include <cpprest/uri.h>
@@ -33,7 +32,7 @@ struct packbranch
     string branch;
     package pack;
 };
-constexpr auto k_max_buffer_size = 4096;
+
 
 extern list_json readJSONAPI(string url,string branch, string arch,string method);
 extern void writeListJSON(string json_str,string branch);
