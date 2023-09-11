@@ -98,7 +98,8 @@ bool IsVersionReleaseMore(package pack1, package pack2){
 	bool cond4 = (pack1.epoch !=0) && (pack1.epoch > pack2.epoch); 
 	bool cond5 = (pack1.version > pack2.version) && (pack1.release > pack2.release);
 	bool cond_general = cond1 && cond2 && cond3 && cond4 && cond5;
-	return cond_general;
+	bool cond_preview = cond2 && cond5;
+	return cond_preview;
 }
 bool IsElemNotInList(list<package> str_list, package pack){
     return find (str_list.begin(), str_list.end(), pack) == str_list.end();
