@@ -4,9 +4,11 @@
 #include <sstream>
 #include <cpprest/http_client.h>
 #include <cpprest/json.h>
+#include <pplx/pplx.h>
 using namespace web::http;
 using namespace web::http::client;
 using namespace web;
+using namespace pplx;
 using namespace std;
 const string method = "export/branch_binary_packages";
 const string REST_API = "https://rdb.altlinux.org";
@@ -46,7 +48,7 @@ list_json readJSONAPI(const string url,string branch, string arch, const string 
     http_client client(url);
     http_request req;
     req.set_method(methods::GET);
-    pplx::task<json::value> requestTask = client.request(req).then([](http_response response)
+    task<json::value> request = client.request(req).then([](http_response response)
     {
         json::value jsonObject;
         try
@@ -65,7 +67,7 @@ list_json readJSONAPI(const string url,string branch, string arch, const string 
         }        
         return jsonObject; // возвращает значения json
     });
-    json::array packages = requestTask.get().at(L"packages").as_array(); // Мы получаем возвращенный ответ здесь
+    json::array packages = request.get().at(L"packages").as_array(); // Мы получаем возвращенный ответ здесь
     list_json js;
     js.branch = branch;
     js.pack = packages.as_list();
