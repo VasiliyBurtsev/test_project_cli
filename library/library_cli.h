@@ -10,7 +10,10 @@
 #include <cpprest/filestream.h>
 #include <cpprest/uri.h>
 #include <cpprest/json.h>
+#include <pplx/pplx.h>
 using namespace std;
+using namespace web;
+using namespace pplx;
 struct package
 {
     string name;
