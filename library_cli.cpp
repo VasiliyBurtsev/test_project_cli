@@ -36,7 +36,7 @@ list_json readJSONAPI(const string url,string branch, string arch, const string 
         // Создаём клиент и привязываем к домену. Туда пойдут наши запросы
       string full_url = url+"/api/"+method+"/"+branch;
       string full_url_s;
-      if (arch != null || arch != ""){
+      if (arch != NULL || arch != ""){
         full_url_s = full_url + "?arch="+arch;
       }
       else {
@@ -54,7 +54,7 @@ list_json readJSONAPI(const string url,string branch, string arch, const string 
             if ( response.status_code() == status_codes::OK )
             {
 		//Установим заголовки для получения типа контента в формате JSON.
-                response.headers().set_content_type(L"application/json"); // Set headers to receive content type as JSON 
+                response.headers().set_content_type(L"application/json"); 
                 // получаем json_объекты
 		jsonObject = response.extract_json().get();
             }
@@ -65,10 +65,10 @@ list_json readJSONAPI(const string url,string branch, string arch, const string 
         }        
         return jsonObject; // возвращает значения json
     });
-    json::array packages = requestTask.get().at(L"packages").as_array(); // We get the returned response here
+    json::array packages = requestTask.get().at(L"packages").as_array(); // Мы получаем возвращенный ответ здесь
     list_json js;
     js.branch = branch;
-    js.pack = packages;
+    js.pack = packages.as_list();
     return js;    	
 }
 void writeListJSON(list_json ljs){    
@@ -90,8 +90,8 @@ void writeListJSON(list_json ljs){
 }
 bool IsVersionReleaseMore(package pack1, package pack2){
 	bool cond1 = pack1.source == pack2.source;
-	bool cond2 = (pack1.name.find(pack2.name) != std::string::npos) || (pack2.name.find(pack1.name) != std::string::npos);
-	bool cond3 = (pack1.epoch != null) && (pack2.epoch != null);
+	bool cond2 = (pack1.name == pack2.name) || (pack1.name.find(pack2.name) != std::string::npos) || (pack2.name.find(pack1.name) != std::string::npos);
+	bool cond3 = (pack1.epoch != NULL) && (pack2.epoch != NULL);
 	bool cond4 = (pack1.epoch !=0) && (pack1.epoch > pack2.epoch); 
 	bool cond5 = (pack1.version > pack2.version) && (pack1.release > pack2.release);
 	bool cond_general = cond1 && cond2 && cond3 && cond4 && cond5;
