@@ -70,7 +70,8 @@ list_json readJSONAPI(const string url,string branch, string arch, const string 
     json::array packages = request.get().at(L"packages").as_array(); // Мы получаем возвращенный ответ здесь
     list_json js;
     js.branch = branch;
-    js.pack = packages.as_list();
+    list<package> packs_list(std::begin(packages), std::end(packages));
+    js.pack = packs_list;
     return js;    	
 }
 void writeListJSON(list_json ljs){    
