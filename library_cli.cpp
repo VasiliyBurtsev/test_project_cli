@@ -96,9 +96,8 @@ bool IsVersionReleaseMore(package pack1, package pack2){
 	bool cond2 = (pack1.name == pack2.name) || (pack1.name.find(pack2.name) != std::string::npos) || (pack2.name.find(pack1.name) != std::string::npos);
 	bool cond3 = (pack1.epoch != NULL) && (pack2.epoch != NULL);
 	bool cond4 = (pack1.epoch !=0) && (pack1.epoch > pack2.epoch); 
-	bool cond5 = (pack1.version > pack2.version) && (pack1.release > pack2.release);
-	bool cond_general = cond1 && cond2 && cond3 && cond4 && cond5;
-	bool cond_preview = cond2 && cond5;
+	bool cond5 = (pack1.version > pack2.version) && (pack1.release > pack2.release);	
+	bool cond_preview = cond1 && cond2 && cond3 && cond4 && cond5;
 	return cond_preview;
 }
 bool IsElemNotInList(list<package> str_list, package pack){
